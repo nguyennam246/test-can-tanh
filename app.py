@@ -8,36 +8,38 @@ from pathlib import Path
 
 
 st.set_page_config(
-    page_title="Test căn tánh – 6 hạt giống tâm",
+    page_title="6 Hạt Giống Tâm",
     page_icon="🌿",
     layout="centered",
 )
 
-# CSS tối ưu mobile
+# CSS tối ưu mobile - hỗ trợ dark/light mode
 st.markdown(
     """
     <style>
-    /* Giảm padding, căn giữa nội dung, khóa max-width cho mobile */
-    .main {
+    /* Giới hạn chiều rộng nội dung, căn giữa */
+    .main .block-container {
+        max-width: 720px;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
         margin: 0 auto;
-        padding: 0.8rem 0.8rem 1.2rem 0.8rem;
-        max-width: 480px;
     }
 
-    /* Tiêu đề */
-    h1 {
-        font-size: 1.6rem !important;
-        line-height: 1.2 !important;
-    }
-    h2 {
-        font-size: 1.25rem !important;
-        line-height: 1.3 !important;
+    /* Tiêu đề chính */
+    h1, h2, h3 {
+        font-weight: 600;
     }
 
-    /* Text body nhỏ gọn hơn */
-    p, label, .stMarkdown {
-        font-size: 0.95rem !important;
-        line-height: 1.5 !important;
+    /* Đoạn mô tả & text chính, giữ màu theo theme, chỉ chỉnh spacing */
+    p {
+        line-height: 1.6;
+    }
+
+    /* Nút: full width trên mobile, vừa phải trên desktop */
+    .stButton > button {
+        border-radius: 999px;
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
     }
 
     /* Radio: khoảng cách vừa phải, dễ bấm bằng ngón tay */
@@ -47,19 +49,6 @@ st.markdown(
     .stRadio > div {
         padding-top: 0.15rem;
         padding-bottom: 0.15rem;
-    }
-
-    /* Các input (tên, nút bắt đầu…) */
-    .stTextInput > div > div > input {
-        font-size: 0.95rem !important;
-    }
-
-    /* Nút bấm full-width, dễ bấm */
-    .stButton button {
-        width: 100%;
-        padding: 0.8rem 1.0rem;
-        font-size: 1rem;
-        border-radius: 8px;
     }
 
     /* Ẩn khung lớn quanh icon phân tích – chỉ giữ icon */
@@ -76,18 +65,43 @@ st.markdown(
         text-align: center;
     }
 
-    /* Thu nhỏ khoảng trắng dọc giữa các block kết quả */
-    .result-block {
-        margin-top: 0.6rem;
-        margin-bottom: 0.6rem;
+    /* Khối kết quả - hỗ trợ dark/light mode */
+    .result-card {
+        border-radius: 12px;
+        padding: 0.9rem 1rem;
+        margin-bottom: 0.75rem;
+        background-color: rgba(255, 255, 255, 0.03);
     }
 
-    /* Ảnh header: full width, bo góc nhẹ */
-    img.header-image {
-        max-width: 100% !important;
-        border-radius: 12px;
-        margin-bottom: 0.8rem;
+    /* MOBILE FIRST */
+    @media (max-width: 600px) {
+        .main .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+        h2, h3 {
+            font-size: 1.2rem;
+        }
+
+        p {
+            font-size: 0.95rem;
+        }
+
+        .stButton > button {
+            width: 100% !important;
+        }
+
+        .result-card {
+            padding: 0.8rem 0.9rem;
+        }
     }
+
+    /* LIGHT & DARK: không set background, chỉ dùng màu tương đối */
+    /* Câu nhắc "Hãy trả lời bằng phản ứng thật..." đã set color riêng rồi, giữ nguyên. */
     </style>
     """,
     unsafe_allow_html=True
@@ -111,7 +125,7 @@ MAPPING = {
         "cach_cham": "Kỷ luật nhỏ → làm đều; hạn chế kích thích mạnh.",
         "dao_hanh": "Hữu Nguyện Hành",
         "dao_hanh_giai_thich": "Làm đều đặn, có kế hoạch, có kỷ luật.",
-        "loi_khuyen": "Giữ nếp sống có trật tự và ổn định.",
+        "loi_khuyen": "Chọn vài nguyên tắc nhỏ nhưng rõ, làm đều mỗi ngày để năng lượng ham muốn chạy đúng đường.",
         "cau_dat": "KỶ LUẬT GIẢI QUYẾT TẤT CẢ",
         "canh_bao_lech": "Dục mạnh nhưng Niệm/Tuệ yếu → dễ chạy theo cảm xúc nhất thời.",
         "dinh_huong_1d4": "Ít kích thích → làm đều.",
@@ -123,7 +137,7 @@ MAPPING = {
         "cach_cham": "Mềm lại → quan sát phản ứng → giảm đối kháng.",
         "dao_hanh": "Vô Tưởng Hành",
         "dao_hanh_giai_thich": "Quan sát cảm xúc cho đến khi tự lắng xuống.",
-        "loi_khuyen": "Đặt sự mềm trước sự đúng.",
+        "loi_khuyen": "Khi bực, dừng lại một nhịp, hạ giọng xuống, chọn cách đáp mềm thay vì thắng–thua.",
         "cau_dat": "MỀM LÀ MẠNH",
         "canh_bao_lech": "Sân cao nhưng điều tiết thấp → dễ phản ứng quá mức.",
         "dinh_huong_1d4": "Chọn môi trường mềm → giảm đối đầu.",
@@ -135,7 +149,7 @@ MAPPING = {
         "cach_cham": "Đơn giản hóa → giảm lựa chọn → giữ mọi thứ rõ ràng.",
         "dao_hanh": "Hữu Nguyện + Vô Nguyện",
         "dao_hanh_giai_thich": "Làm đều nhưng giảm mong cầu, đi chậm.",
-        "loi_khuyen": "Một việc một lần.",
+        "loi_khuyen": "Dọn bớt việc và lựa chọn, chỉ giữ những gì thật sự cần để đầu óc sáng và nhẹ.",
         "cau_dat": "ĐƠN GIẢN HOÁ ĐỂ THẤY RÕ",
         "canh_bao_lech": "Si cao + Tuệ thấp → dễ mơ hồ, dễ rối.",
         "dinh_huong_1d4": "Giữ cuộc sống rõ ràng, tối giản.",
@@ -147,7 +161,7 @@ MAPPING = {
         "cach_cham": "Củng cố niềm tin → chọn người đúng → môi trường đúng.",
         "dao_hanh": "Vô Nguyện Hành",
         "dao_hanh_giai_thich": "Bớt mong cầu, bớt cố gắng, sống đơn giản – less is more.",
-        "loi_khuyen": "Giữ một đường đúng, đừng đổi hướng.",
+        "loi_khuyen": "Chọn vài giá trị cốt lõi, bám vào đó khi mọi thứ đổi thay để không bị cuốn trôi.",
         "cau_dat": "GIỮ VỮNG ĐIỀU ĐÚNG",
         "canh_bao_lech": "Tín cao + Dục/Sân mạnh → dễ theo nhầm người hoặc lung lay.",
         "dinh_huong_1d4": "Chọn người đúng, môi trường đúng.",
@@ -159,7 +173,7 @@ MAPPING = {
         "cach_cham": "Quan sát thân–tâm → sống chậm → tạo khoảng lặng.",
         "dao_hanh": "Vô Tưởng + Vô Nguyện",
         "dao_hanh_giai_thich": "Quan sát cảm xúc mà không phản ứng ngay, sống chậm.",
-        "loi_khuyen": "Tạo khoảng dừng trong ngày.",
+        "loi_khuyen": "Giảm bớt kích thích và việc thừa để có chỗ cho sự nhận biết trong hiện tại.",
         "cau_dat": "LESS IS MORE",
         "canh_bao_lech": "Niệm cao nhưng Sân/Dục mạnh → dễ tán loạn khi cảm xúc mạnh.",
         "dinh_huong_1d4": "Giảm tốc, sống chậm.",
@@ -171,7 +185,7 @@ MAPPING = {
         "cach_cham": "Thấy rõ → buông → hành ít nhưng đúng.",
         "dao_hanh": "Vô Nguyện + Vô Tưởng",
         "dao_hanh_giai_thich": "Quan sát rõ, không tạo câu chuyện, làm ít mà đúng.",
-        "loi_khuyen": "Thấy rõ rồi buông.",
+        "loi_khuyen": "Dùng hiểu biết để thả lỏng, không để trí phân tích kéo bạn vào vòng xoáy suy nghĩ.",
         "cau_dat": "THẤY RÕ RỒI BUÔNG",
         "canh_bao_lech": "Tuệ cao + Dục/Sân mạnh → dễ dùng lý trí để né cảm xúc.",
         "dinh_huong_1d4": "Buông phân tích → hành ít nhưng chuẩn.",
@@ -710,19 +724,123 @@ def calculate_scores(answers: list[dict]) -> tuple[dict, dict, dict]:
     return total_scores, layer_scores, summary
 
 # ============================================================================
+# HÀM TÍNH NGUY CƠ THEO BỘ ĐÔI
+# ============================================================================
+
+def get_nguy_co(hat_chinh, hat_phu, total_scores=None):
+    """Tự động sinh nguy cơ theo bộ đôi hạt chính + hạt hỗ trợ."""
+    if not hat_chinh:
+        return None
+    
+    # Nếu có hạt hỗ trợ, luôn dùng logic pair-based trước
+    if hat_phu:
+        nguy_co_map = {
+            ("Tuệ", "Niệm"): "Dễ phân tích quá mức, xa rời trải nghiệm.",
+            ("Tuệ", "Tín"): "Dễ lý tưởng hóa, tin điều sai.",
+            ("Niệm", "Tuệ"): "Dễ quan sát nhiều nhưng không xử lý cảm xúc.",
+            ("Niệm", "Tín"): "Dễ lệ thuộc vào giá trị/niềm tin cố định.",
+            ("Tín", "Tuệ"): "Dễ chấp vào lý tưởng đúng/sai.",
+            ("Tín", "Niệm"): "Dễ lệ thuộc vào giá trị/niềm tin cố định.",
+        }
+        pair = (hat_chinh, hat_phu)
+        nguy_co = nguy_co_map.get(pair, None)
+        if nguy_co:
+            return nguy_co
+    
+    # Chỉ áp dụng điều kiện đặc biệt khi KHÔNG có hạt hỗ trợ
+    if not hat_phu and total_scores:
+        niem_score = total_scores.get("niem", 0)
+        tin_score = total_scores.get("tin", 0)
+        
+        # Điều kiện đặc biệt cho Tuệ khi không có hạt hỗ trợ
+        if hat_chinh == "Tuệ":
+            if niem_score <= 1:
+                return "Tuệ mạnh nhưng Niệm thấp → dễ phân tích quá mức, tách khỏi cảm xúc thật."
+            if tin_score <= 1:
+                return "Tuệ mạnh nhưng Tín thấp → không có điểm tựa giá trị, dễ hoang mang khi nhiều lựa chọn."
+    
+    return None
+
+# ============================================================================
 # HÀM GỌI GPT
 # ============================================================================
 
 def calculate_tiers(total_scores, layer_scores, summary):
     """Tự tính 3 tầng không cần GPT."""
-    # Hạt chính = nhóm có điểm cao nhất
-    sorted_total = sorted(total_scores.items(), key=lambda x: x[1], reverse=True)
-    hat_chinh_key = sorted_total[0][0] if sorted_total else None
-    hat_phu_key = sorted_total[1][0] if len(sorted_total) > 1 and sorted_total[1][1] > 0 else None
+    # Chuyển total_scores từ key lowercase (duc, san, si...) sang key Capitalize (Duc, San, Si...)
+    scores = {}
+    label_map = {
+        "duc": "Duc",
+        "san": "San",
+        "si": "Si",
+        "tin": "Tin",
+        "niem": "Niem",
+        "tue": "Tue",
+    }
+    label_map_vn = {
+        "Duc": "Dục",
+        "San": "Sân",
+        "Si": "Si",
+        "Tin": "Tín",
+        "Niem": "Niệm",
+        "Tue": "Tuệ",
+    }
     
-    # Chuyển key sang label
-    hat_chinh_label = TEMPERAMENTS[hat_chinh_key]["label"] if hat_chinh_key else None
-    hat_phu_label = TEMPERAMENTS[hat_phu_key]["label"] if hat_phu_key else None
+    for key, value in total_scores.items():
+        key_cap = label_map.get(key, key.capitalize())
+        scores[key_cap] = value
+    
+    # Thứ tự ưu tiên cho hạt chính: Tuệ > Niệm > Tín > Dục > Sân > Si
+    priority_main = ["Tue", "Niem", "Tin", "Duc", "San", "Si"]
+    
+    # 1. Hạt chính = điểm cao nhất
+    max_score = max(scores.values())
+    candidates_main = [k for k, v in scores.items() if v == max_score]
+    hat_chinh = None
+    for p in priority_main:
+        if p in candidates_main:
+            hat_chinh = p
+            break
+    
+    # 2. Hạt hỗ trợ = CHỈ chọn trong nhóm Tín, Niệm, Tuệ (trừ hạt chính)
+    # Loại hoàn toàn Dục, Sân, Si khỏi danh sách ứng viên
+    nhom_sang = ["Tin", "Niem", "Tue"]
+    # Loại hạt chính khỏi nhóm sáng
+    nhom_sang_con_lai = [h for h in nhom_sang if h != hat_chinh]
+    
+    # Chỉ xét điểm trong nhóm sáng còn lại
+    scores_phu = {k: v for k, v in scores.items() if k in nhom_sang_con_lai}
+    
+    if scores_phu:
+        # Tìm điểm cao nhất trong nhóm sáng còn lại
+        max_score_phu = max(scores_phu.values())
+        candidates_sub = [k for k, v in scores_phu.items() if v == max_score_phu]
+        
+        # Ưu tiên theo hạt chính
+        hat_phu = None
+        if hat_chinh == "Tue":
+            # Nếu hạt chính = Tuệ: ưu tiên Tín > Niệm
+            priority_phu = ["Tin", "Niem"]
+        elif hat_chinh == "Tin":
+            # Nếu hạt chính = Tín: ưu tiên Tuệ > Niệm
+            priority_phu = ["Tue", "Niem"]
+        elif hat_chinh == "Niem":
+            # Nếu hạt chính = Niệm: ưu tiên Tuệ > Tín
+            priority_phu = ["Tue", "Tin"]
+        else:
+            # Hạt chính là Dục/Sân/Si: ưu tiên mặc định
+            priority_phu = ["Tin", "Niem", "Tue"]
+        
+        for p in priority_phu:
+            if p in candidates_sub:
+                hat_phu = p
+                break
+    else:
+        hat_phu = None
+    
+    # Ánh xạ key tiếng Anh → label tiếng Việt
+    hat_chinh_label = label_map_vn[hat_chinh] if hat_chinh else None
+    hat_phu_label = label_map_vn[hat_phu] if hat_phu else None
     
     # Hạt gốc = max(Dục, Sân, Si)
     goc_scores = layer_scores.get("goc", {})
@@ -779,7 +897,7 @@ def calculate_tiers(total_scores, layer_scores, summary):
 # ============================================================================
 
 def render_results(total_scores, layer_scores, summary, tier_result, mapping_data, user_answers=None, questions=None):
-    """Hiển thị kết quả test căn tánh."""
+    """Hiển thị kết quả test hạt giống tâm."""
     st.markdown("---")
     st.header("📊 Kết quả")
 
@@ -787,13 +905,11 @@ def render_results(total_scores, layer_scores, summary, tier_result, mapping_dat
     can_tanh_chinh_label = tier_result.get("can_tanh_chinh")
     can_tanh_phu_label = tier_result.get("can_tanh_phu")
     
-    st.subheader("Căn tánh của bạn")
+    st.subheader("1. Hạt nổi trội")
     if can_tanh_chinh_label:
-        st.markdown(f"**Căn tánh chính (overall):** {can_tanh_chinh_label}")
+        st.markdown(f"**Hạt chính:** {can_tanh_chinh_label}")
     if can_tanh_phu_label:
-        st.markdown(f"**Căn tánh phụ (overall):** {can_tanh_phu_label}")
-
-    st.subheader("Phân tích căn tánh")
+        st.markdown(f"**Hạt hỗ trợ:** {can_tanh_phu_label}")
     
     # Lấy dữ liệu từ mapping
     if can_tanh_chinh_label and can_tanh_chinh_label in MAPPING:
@@ -806,34 +922,41 @@ def render_results(total_scores, layer_scores, summary, tier_result, mapping_dat
             unsafe_allow_html=True
         )
         
-        st.markdown("**🔹 1. HẠT GIỐNG TÂM GỐC**")
-        st.write(f"**{can_tanh_chinh_label} tánh**")
-
-        st.markdown("**🔹 2. ĐẤT HỢP cho loại hạt đó**")
+        st.subheader("2. Mảnh đất phù hợp")
         st.write(f"**{map_data['dat_hop']}**")
         st.write(map_data.get("cach_cham", ""))
 
-        st.markdown("**🔹 3. ĐẠO HÀNH PHÙ HỢP**")
+        st.subheader("3. Cách chăm phù hợp")
         st.write(f"**{map_data['dao_hanh']}**")
         st.write(map_data.get("dao_hanh_giai_thich", ""))
 
-        st.markdown("**🔹 4. LỜI KHUYÊN NGẮN GỌN**")
+        st.subheader("4. Tuyên ngôn & Lời khuyên")
+        st.markdown(f"**{map_data.get('cau_dat', '—')}**")
         st.write(map_data.get("loi_khuyen", "—"))
 
-        st.markdown("**🔹 5. TUYÊN NGÔN CĂN TÁNH (MANTRA)**")
-        st.write(f"**{map_data.get('cau_dat', '—')}**")
+        st.subheader("5. Nguy cơ")
+        # Tự động sinh nguy cơ theo bộ đôi hạt chính + hạt hỗ trợ
+        nguy_co = get_nguy_co(can_tanh_chinh_label, can_tanh_phu_label, total_scores)
+        if nguy_co:
+            st.write(nguy_co)
+        else:
+            st.write(map_data.get('canh_bao_lech', '—'))
 
-        st.markdown("**🔹 6. CẢNH BÁO LỆCH TẦNG CĂN TÁNH**")
-        st.write(map_data.get("canh_bao_lech", "—"))
-
-        st.markdown("**🔹 7. ĐỊNH HƯỚNG SỐNG**")
+        st.subheader("6. Định hướng sống")
         st.write(map_data.get("dinh_huong_1d4", "—"))
     else:
-        st.warning("Không tìm thấy dữ liệu mapping cho căn tánh này.")
+        st.warning("Không tìm thấy dữ liệu mapping cho hạt giống tâm này.")
 
     st.markdown("---")
+    
+    # Footer với text và nút tải xuống căn giữa
     st.markdown(
-        "<p style='text-align:center; font-size:15px;'>Hãy chụp màn hình để lưu kết quả.</p>",
+        """
+        <p style='text-align:center; font-size:0.95rem; line-height:1.5;'>
+        Hãy chụp màn hình để lưu kết quả.<br/>
+        Hoặc
+        </p>
+        """,
         unsafe_allow_html=True
     )
     
@@ -848,12 +971,15 @@ def render_results(total_scores, layer_scores, summary, tier_result, mapping_dat
             mapping=MAPPING
         )
         
-        st.download_button(
-            label="📥 Tải xuống kết quả đầy đủ (.txt)",
-            data=export_full,
-            file_name="ket_qua_can_tanh_day_du.txt",
-            mime="text/plain",
-        )
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.download_button(
+                label="📥 Tải xuống kết quả đầy đủ (.txt)",
+                data=export_full,
+                file_name="ket_qua_6_hat_tam.txt",
+                mime="text/plain",
+                use_container_width=True,
+            )
 
 
 # Hàm save_result đã bỏ - app không lưu kết quả
@@ -865,13 +991,13 @@ def render_results(total_scores, layer_scores, summary, tier_result, mapping_dat
 def build_full_export_text(questions, user_answers, scores, main_trait, sub_trait, mapping):
     """Tạo nội dung file txt đầy đủ để tải xuống."""
     lines = []
-    lines.append("BÀI TEST 6 HẠT GIỐNG TÂM – BẢN KẾT QUẢ ĐẦY ĐỦ")
+    lines.append("KẾT QUẢ BÀI TEST 6 HẠT GIỐNG TÂM")
     lines.append("")
-    lines.append("Bạn có thể dán toàn bộ nội dung này vào ChatGPT để nhờ tư vấn thêm.")
+    lines.append("=" * 50)
     lines.append("")
 
-    # Phần A – Câu hỏi + đáp án
-    lines.append("A. 12 CÂU HỎI & ĐÁP ÁN BẠN ĐÃ CHỌN:")
+    # Phần 1 – 12 câu hỏi & câu trả lời
+    lines.append("1. 12 CÂU HỎI & CÂU TRẢ LỜI")
     lines.append("")
 
     for i in range(len(questions)):
@@ -880,25 +1006,33 @@ def build_full_export_text(questions, user_answers, scores, main_trait, sub_trai
         choice_label = q_data["choice_label"]
         choice_text = q_data["choice_text"]
 
-        lines.append(f"Câu {i+1}: {question_text}")
-        lines.append(f"→ Bạn chọn: {choice_label}. {choice_text}")
+        lines.append(f"• Câu {i+1}: {question_text}")
+        lines.append(f"  → Bạn chọn: {choice_label}. {choice_text}")
         lines.append("")
 
-    lines.append("======================================")
-    lines.append("B. KẾT QUẢ CĂN TÁNH")
-    lines.append("======================================")
+    lines.append("=" * 50)
     lines.append("")
 
-    # Điểm 6 căn
-    lines.append("Điểm tổng 6 căn tánh:")
-    for key, value in scores.items():
-        trait_label = TEMPERAMENTS[key]["label"]
-        lines.append(f"- {trait_label}: {value}")
+    # Phần 2 – Hạt nổi trội
+    lines.append("2. HẠT NỔI TRỘI")
     lines.append("")
-
-    lines.append(f"Căn tánh chính (overall): {main_trait}")
+    lines.append(f"• Hạt chính: {main_trait}")
     if sub_trait:
-        lines.append(f"Căn tánh phụ (overall): {sub_trait}")
+        lines.append(f"• Hạt hỗ trợ: {sub_trait}")
+    lines.append("")
+    
+    # Debug: Điểm tổng 6 hạt
+    lines.append("ĐIỂM TỔNG 6 HẠT:")
+    label_map_vn = {
+        "duc": "Dục",
+        "san": "Sân",
+        "si": "Si",
+        "tin": "Tín",
+        "niem": "Niệm",
+        "tue": "Tuệ",
+    }
+    for k in ["duc", "san", "si", "tin", "niem", "tue"]:
+        lines.append(f"- {label_map_vn[k]}: {scores.get(k, 0)}")
     lines.append("")
 
     trait_info = mapping.get(main_trait, {})
@@ -907,42 +1041,42 @@ def build_full_export_text(questions, user_answers, scores, main_trait, sub_trai
     cach_cham = trait_info.get("cach_cham", "")
     dao_hanh = trait_info.get("dao_hanh", "")
     dao_hanh_giai_thich = trait_info.get("dao_hanh_giai_thich", "")
+    loi_khuyen = trait_info.get("loi_khuyen", "")
     mantra = trait_info.get("cau_dat", "")
     canh_bao = trait_info.get("canh_bao_lech", "")
     dinh_huong = trait_info.get("dinh_huong_1d4", "")
 
-    # Phần C – Chi tiết hạt giống
-    lines.append("1. Hạt giống tâm gốc:")
-    lines.append(f"- {main_trait}")
+    # Phần 3 – Mảnh đất phù hợp
+    lines.append("3. MẢNH ĐẤT PHÙ HỢP")
+    lines.append("")
+    lines.append(f"• {dat_hop}")
     lines.append("")
 
-    lines.append("2. Mảnh đất / môi trường phù hợp:")
-    lines.append(f"- {dat_hop}")
+    # Phần 4 – Cách chăm phù hợp
+    lines.append("4. CÁCH CHĂM PHÙ HỢP")
+    lines.append("")
+    lines.append(f"• {cach_cham}")
     lines.append("")
 
-    lines.append("3. Cách chăm phù hợp:")
-    lines.append(f"- {cach_cham}")
+    # Phần 5 – Tuyên ngôn & Lời khuyên
+    lines.append("5. TUYÊN NGÔN & LỜI KHUYÊN")
+    lines.append("")
+    lines.append(f"• Tuyên ngôn: {mantra}")
+    lines.append(f"• Lời khuyên: {loi_khuyen}")
     lines.append("")
 
-    lines.append("4. Đạo hành:")
-    lines.append(f"- {dao_hanh}")
-    if dao_hanh_giai_thich:
-        lines.append(f"- Giải thích: {dao_hanh_giai_thich}")
+    # Phần 6 – Nguy cơ
+    lines.append("6. NGUY CƠ")
+    lines.append("")
+    lines.append(f"• {canh_bao}")
     lines.append("")
 
-    lines.append("5. Tuyên ngôn căn tánh (mantra):")
-    lines.append(f"- {mantra}")
+    # Phần 7 – Định hướng sống
+    lines.append("7. ĐỊNH HƯỚNG SỐNG")
+    lines.append("")
+    lines.append(f"• {dinh_huong}")
     lines.append("")
 
-    lines.append("6. Cảnh báo lệch tầng:")
-    lines.append(f"- {canh_bao}")
-    lines.append("")
-
-    lines.append("7. Định hướng sống:")
-    lines.append(f"- {dinh_huong}")
-    lines.append("")
-
-    lines.append("KẾT THÚC.")
     return "\n".join(lines)
 
 
@@ -951,18 +1085,62 @@ def build_full_export_text(questions, user_answers, scores, main_trait, sub_trai
 # ============================================================================
 
 def main():
-    # Header text căn giữa
+    # --- HEADER TITLE ---
     st.markdown(
         """
-        <h3 style='text-align:center; font-weight:600; line-height:1.4;'>
-        Nhận ra được căn tánh hạt giống tâm của bạn để gieo vào đúng mảnh đất phù hợp.
-        </h3>
+        <h1 style="
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        ">
+            Chỉ cần gieo hạt vào đúng đất, tự nhiên sẽ chăm lo cho bạn.
+        </h1>
         """,
         unsafe_allow_html=True
     )
     
-    st.title("🌱 Test căn tánh – 6 hạt giống tâm")
-    st.markdown("---")
+    # --- HEADER IMAGE (hat_giong_tam.png) ---
+    from PIL import Image
+    
+    # Kiểm tra đường dẫn ảnh
+    img_path = "images/hat_giong_tam.png"
+    if not os.path.exists(img_path):
+        img_path = "hat_giong_tam.png"  # Thử đường dẫn gốc
+    
+    if os.path.exists(img_path):
+        header_img = Image.open(img_path)
+        st.markdown(
+            """
+            <div style="display:flex; justify-content:center; margin-top: 0.3rem; margin-bottom: 0.3rem;">
+                <div style="max-width: 480px; width: 100%;">
+            """,
+            unsafe_allow_html=True
+        )
+        st.image(header_img, use_container_width=True)
+        st.markdown(
+            """
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    
+    # --- HEADER SUBTITLE / REMINDER ---
+    st.markdown(
+        """
+        <p style="
+            text-align: center;
+            font-size: 0.95rem;
+            opacity: 0.95;
+            margin-top: 0.4rem;
+            margin-bottom: 1.2rem;
+        ">
+            Hãy trả lời bằng phản ứng thật của bạn, vì hạt nào cần đất nấy — thực lòng sẽ cho ra kết quả tốt cho bạn.
+        </p>
+        """,
+        unsafe_allow_html=True
+    )
 
     # Khởi tạo shuffled_options nếu chưa có
     if "shuffled_options" not in st.session_state:
@@ -979,27 +1157,24 @@ def main():
     }
 
     with st.form("quiz_form"):
-        # Khối 1: 12 câu hỏi trắc nghiệm
-        with st.container():
-            st.subheader("1. 12 câu hỏi trắc nghiệm")
-            answers_dict = {}
+        answers_dict = {}
 
-            for i, q in enumerate(QUESTIONS, start=1):
-                st.markdown(f"**Câu {i}. {q['text']}**")
-                opts = st.session_state["shuffled_options"][q["id"]]
-                choice = st.radio(
-                    "",
-                    options=[opt["value"] for opt in opts],
-                    format_func=lambda v, opts=opts: next(
-                        o["label"] for o in opts if o["value"] == v
-                    ),
-                    key=f"q_{q['id']}",
-                    index=None,
-                    label_visibility="collapsed",
-                )
-                answers_dict[q["id"]] = choice
-                if i < len(QUESTIONS):
-                    st.markdown("")
+        for i, q in enumerate(QUESTIONS, start=1):
+            st.markdown(f"**Câu {i}. {q['text']}**")
+            opts = st.session_state["shuffled_options"][q["id"]]
+            choice = st.radio(
+                "",
+                options=[opt["value"] for opt in opts],
+                format_func=lambda v, opts=opts: next(
+                    o["label"] for o in opts if o["value"] == v
+                ),
+                key=f"q_{q['id']}",
+                index=None,
+                label_visibility="collapsed",
+            )
+            answers_dict[q["id"]] = choice
+            if i < len(QUESTIONS):
+                st.markdown("")
 
         submitted = st.form_submit_button("Xem kết quả", type="primary")
 
@@ -1055,10 +1230,10 @@ def main():
             if can_tanh_chinh_label and can_tanh_chinh_label in MAPPING:
                 mapping_data = MAPPING[can_tanh_chinh_label]
 
-            # Khối 2: Kết quả căn tánh
+            # Khối 2: Kết quả
             st.divider()
             with st.container():
-                st.subheader("2. Kết quả căn tánh")
+                st.subheader("2. Kết quả")
                 render_results(
                     total_scores, 
                     layer_scores, 
