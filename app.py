@@ -911,6 +911,37 @@ def render_results(total_scores, layer_scores, summary, tier_result, mapping_dat
     if can_tanh_phu_label:
         st.markdown(f"**Hạt hỗ trợ:** {can_tanh_phu_label}")
     
+    # Bảng điểm tổng 6 hạt
+    st.markdown("---")
+    st.subheader("2. Điểm tổng 6 hạt")
+    
+    # Chuyển đổi total_scores sang label tiếng Việt
+    label_map_vn = {
+        "duc": "Dục",
+        "san": "Sân",
+        "si": "Si",
+        "tin": "Tín",
+        "niem": "Niệm",
+        "tue": "Tuệ",
+    }
+    icon_map = {
+        "Dục": "🌱",
+        "Sân": "🔥",
+        "Si": "🌫️",
+        "Tín": "✨",
+        "Niệm": "👁️",
+        "Tuệ": "🔍",
+    }
+    
+    # Hiển thị điểm từng hạt
+    for key in ["duc", "san", "si", "tin", "niem", "tue"]:
+        label = label_map_vn[key]
+        score = total_scores.get(key, 0)
+        icon = icon_map.get(label, "•")
+        st.markdown(f"- {icon} **{label}:** {score}")
+    
+    st.markdown("---")
+    
     # Lấy dữ liệu từ mapping
     if can_tanh_chinh_label and can_tanh_chinh_label in MAPPING:
         map_data = MAPPING[can_tanh_chinh_label]
@@ -922,19 +953,19 @@ def render_results(total_scores, layer_scores, summary, tier_result, mapping_dat
             unsafe_allow_html=True
         )
         
-        st.subheader("2. Mảnh đất phù hợp")
+        st.subheader("3. Mảnh đất phù hợp")
         st.write(f"**{map_data['dat_hop']}**")
         st.write(map_data.get("cach_cham", ""))
 
-        st.subheader("3. Cách chăm phù hợp")
+        st.subheader("4. Cách chăm phù hợp")
         st.write(f"**{map_data['dao_hanh']}**")
         st.write(map_data.get("dao_hanh_giai_thich", ""))
 
-        st.subheader("4. Tuyên ngôn & Lời khuyên")
+        st.subheader("5. Tuyên ngôn & Lời khuyên")
         st.markdown(f"**{map_data.get('cau_dat', '—')}**")
         st.write(map_data.get("loi_khuyen", "—"))
 
-        st.subheader("5. Nguy cơ")
+        st.subheader("6. Nguy cơ")
         # Tự động sinh nguy cơ theo bộ đôi hạt chính + hạt hỗ trợ
         nguy_co = get_nguy_co(can_tanh_chinh_label, can_tanh_phu_label, total_scores)
         if nguy_co:
@@ -942,7 +973,7 @@ def render_results(total_scores, layer_scores, summary, tier_result, mapping_dat
         else:
             st.write(map_data.get('canh_bao_lech', '—'))
 
-        st.subheader("6. Định hướng sống")
+        st.subheader("7. Định hướng sống")
         st.write(map_data.get("dinh_huong_1d4", "—"))
     else:
         st.warning("Không tìm thấy dữ liệu mapping cho hạt giống tâm này.")
