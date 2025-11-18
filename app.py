@@ -905,15 +905,8 @@ def render_results(total_scores, layer_scores, summary, tier_result, mapping_dat
     can_tanh_chinh_label = tier_result.get("can_tanh_chinh")
     can_tanh_phu_label = tier_result.get("can_tanh_phu")
     
-    st.subheader("1. Hạt nổi trội")
-    if can_tanh_chinh_label:
-        st.markdown(f"**Hạt chính:** {can_tanh_chinh_label}")
-    if can_tanh_phu_label:
-        st.markdown(f"**Hạt hỗ trợ:** {can_tanh_phu_label}")
-    
-    # Bảng điểm tổng 6 hạt
-    st.markdown("---")
-    st.subheader("2. Điểm tổng 6 hạt")
+    # 1. Bảng điểm 6 hạt - HIỂN THỊ ĐẦU TIÊN
+    st.subheader("1. Bảng điểm 6 hạt")
     
     # Chuyển đổi total_scores sang label tiếng Việt
     label_map_vn = {
@@ -924,23 +917,25 @@ def render_results(total_scores, layer_scores, summary, tier_result, mapping_dat
         "niem": "Niệm",
         "tue": "Tuệ",
     }
-    icon_map = {
-        "Dục": "🌱",
-        "Sân": "🔥",
-        "Si": "🌫️",
-        "Tín": "✨",
-        "Niệm": "👁️",
-        "Tuệ": "🔍",
-    }
     
-    # Hiển thị điểm từng hạt
+    # Tạo DataFrame cho bảng điểm
+    score_data = []
     for key in ["duc", "san", "si", "tin", "niem", "tue"]:
         label = label_map_vn[key]
         score = total_scores.get(key, 0)
-        icon = icon_map.get(label, "•")
-        st.markdown(f"- {icon} **{label}:** {score}")
+        score_data.append({"Hạt giống tâm": label, "Điểm": score})
+    
+    df_scores = pd.DataFrame(score_data)
+    st.dataframe(df_scores, use_container_width=True, hide_index=True)
     
     st.markdown("---")
+    
+    # 2. Hạt nổi trội
+    st.subheader("2. Hạt nổi trội")
+    if can_tanh_chinh_label:
+        st.markdown(f"**Hạt chính:** {can_tanh_chinh_label}")
+    if can_tanh_phu_label:
+        st.markdown(f"**Hạt hỗ trợ:** {can_tanh_phu_label}")
     
     # Lấy dữ liệu từ mapping
     if can_tanh_chinh_label and can_tanh_chinh_label in MAPPING:
